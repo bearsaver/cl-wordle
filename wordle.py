@@ -2,24 +2,55 @@
 
 from colorama import Fore, Back, Style
 
-def check_guess(guess, answer):
-	ret = []
-	gre_ct = 0
+def green(char):
+	print(Fore.GREEN + char, end="")
+
+def yellow(char):
+	print(Fore.YELLOW + char, end="")
+
+def white(char):
+	print(Fore.WHITE + char, end="")
+
+def reset():
+	print(Style.RESET_ALL)
+
+
+
+def check_guess(guess, word):
+	char_cts = get_word_info(word)
+	print(char_cts)
+	ret = 0
 	for i in range(0, len(guess)):
-		if guess[i] in answer:
-			if guess[i] == answer[i]:
-				ret.append(1)
-				gre_ct += 1
+		if guess[i] in word:
+			if guess[i] == word[i]:
+				if char_cts[word[i]] != 0:
+					green(guess[i])
+					char_cts[word[i]] -= 1
+					ret += 1
+				else:
+					white(guess[i])
 			else:
-				ret.append(0)
+				if char_cts[word[i]] != 0:
+					yellow(guess[i])
+					char_cts[word[i]] -= 1
+				else:
+					white(guess[i])
 		else:
-			ret.append(-1)
+			white(guess[i])
+	reset()
 	
 	return ret
 
-def search_list():
-	# TODO: implement this
-	return
+def get_word_info(word):
+	chars = []
+	ret = {}
+	for i in range(0, len(word)):
+		if not (word[i] in chars):
+			chars.append(word[i])
+			ret[word[i]] = 1
+		else:
+			ret[word[i]] += 1
+	return ret
 
 # pick words, create list of characters
 answer = "hello"
@@ -29,7 +60,7 @@ guess_number = 0
 guesses = []
 
 while(guess_number < 6):
-	
+
 	# validate user input - make sure it's alphabetic and 5 chars
 	while(True):
 		guess = input(f"guess {guess_number}: ")
@@ -42,20 +73,9 @@ while(guess_number < 6):
 
 	# check guess
 	guess = guesses[guess_number - 1]
-	data = check_guess(guess, answer)
 
-	for i in range(0, len(data)):
-		if (data[i] == 1):
-			print(Fore.GREEN + guess[i], end="")
-		elif (data[i] == 0):
-			print(Fore.YELLOW + guess[i], end="")
-		else:
-			print(Fore.WHITE + guess[i], end="")
-		print(Style.RESET_ALL, end="")
 
-	print()
 
-	if data == [1, 1, 1, 1, 1]:
-		print("You got the word!")
+	if check_guess(guess, answer) == 5:
+		print('You got the word!')
 		break
-	
